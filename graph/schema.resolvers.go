@@ -11,14 +11,29 @@ import (
 	"github.com/DanteMichaeli/CookBookAPI/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateRecipe is the resolver for the createRecipe field.
+func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, image *string, ingredients []string, steps []string) (*model.Recipe, error) {
+	panic(fmt.Errorf("not implemented: CreateRecipe - createRecipe"))
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// UpdateRecipe is the resolver for the updateRecipe field.
+func (r *mutationResolver) UpdateRecipe(ctx context.Context, title string, description *string, image *string, ingredients []string, steps []string) (*model.Recipe, error) {
+	panic(fmt.Errorf("not implemented: UpdateRecipe - updateRecipe"))
+}
+
+// DeleteRecipe is the resolver for the deleteRecipe field.
+func (r *mutationResolver) DeleteRecipe(ctx context.Context, title string) (*bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteRecipe - deleteRecipe"))
+}
+
+// ListRecipes is the resolver for the listRecipes field.
+func (r *queryResolver) ListRecipes(ctx context.Context) ([]*model.Recipe, error) {
+	panic(fmt.Errorf("not implemented: ListRecipes - listRecipes"))
+}
+
+// OpenRecipe is the resolver for the openRecipe field.
+func (r *queryResolver) OpenRecipe(ctx context.Context, title string) (*model.Recipe, error) {
+	panic(fmt.Errorf("not implemented: OpenRecipe - openRecipe"))
 }
 
 // Mutation returns MutationResolver implementation.

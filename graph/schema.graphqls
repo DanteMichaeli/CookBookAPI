@@ -12,21 +12,15 @@ type Recipe {
   steps: [String!]!
 }
 
-
-
-# list of recipes, only the title
 type Query {
-  recipes: [Recipe]
+  # list of recipes, only the title
+  listRecipes: [Recipe]
+  # open a specific recipe
+  openRecipe(title: String!): Recipe
 }
 
-# open a specific recipe
-type Query {
-  recipe(title: String!): Recipe
-}
-
-
-# create a new recipe
 type Mutation {
+  # create a new recipe
   createRecipe(
     id: ID!
     title: String!
@@ -35,10 +29,8 @@ type Mutation {
     ingredients: [String!]!
     steps: [String!]!
   ): Recipe
-}
 
-# modify the information fields of a recipe, and return the updated recipe
-type Mutation {
+  # update a recipe
   updateRecipe(
     title: String!
     description: String
@@ -46,11 +38,7 @@ type Mutation {
     ingredients: [String!]
     steps: [String!]
   ): Recipe
-}
 
-# delete a recipe
-type Mutation {
+  # delete a recipe
   deleteRecipe(title: String!): Boolean
 }
-
-
