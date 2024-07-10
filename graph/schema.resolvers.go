@@ -6,14 +6,49 @@ package graph
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/DanteMichaeli/CookBookAPI/graph/model"
 )
 
+const recipesDir = "recipes"
+
 // CreateRecipe is the resolver for the createRecipe field.
-func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, image *string, ingredients []string, steps []string) (*model.Recipe, error) {
-	panic(fmt.Errorf("not implemented: CreateRecipe - createRecipe"))
+func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, image string, ingredients []string, steps []string) (*model.Recipe, error) {
+	//new recipe instance
+	recipe := &model.Recipe{
+		ID:          id,
+		Title:       title,
+		Description: description,
+		Image:       image,
+		Ingredients: ingredients,
+		Steps:       steps,
+	}
+
+	//encode to JSON
+	recipeJSON, err := json.Marshal(recipe)
+	if err != nil {
+		return nil, fmt.Errorf("error encoding recipe: %w", err)
+	}
+
+	// Directory info for saving recipes
+	err = os.MkdirAll(recipesDir, 0755)
+	if err != nil {
+		return nil, fmt.Errorf("error creating recipes directory: %w", err)
+	}
+
+	// Write recipe to file
+	fileName := fmt.Sprintf("%s.json", id)
+	filePath := filepath.Join(recipesDir, fileName)
+	err = os.WriteFile(filePath, recipeJSON, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("error writing recipe to file: %w", err)
+	}
+
+	return recipe, nil
 }
 
 // UpdateRecipe is the resolver for the updateRecipe field.
