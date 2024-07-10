@@ -142,7 +142,31 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, title string) (*mod
 
 // ListRecipes is the resolver for the listRecipes field.
 func (r *queryResolver) ListRecipes(ctx context.Context) ([]*model.Recipe, error) {
-	panic(fmt.Errorf("not implemented: ListRecipes - listRecipes"))
+	// list files in recipes directory
+	files, err := os.ReadDir(recipesDir)
+	if err != nil {
+		return nil, fmt.Errorf("error reading recipes directory: %w", err)
+	}
+
+	recipes := []*model.Recipe{}
+	for _, file := range files {
+		// read recipe file
+		recipeJSON, err := os.ReadFile(filepath.Join(recipesDir, file.Name()))
+		if err != nil {
+			return nil, fmt.Errorf("error reading recipe file: %w", err)
+		}
+
+		// decode recipe
+		recipe := &model.Recipe{}
+		err = json.Unmarshal(recipeJSON, recipe)
+		if err != nil {
+			return nil, fmt.Errorf("error decoding recipe: %w", err)
+		}
+
+		recipes = append(recipes, recipe)
+	}
+
+	return recipes, nil
 }
 
 // OpenRecipe is the resolver for the openRecipe field.
