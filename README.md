@@ -14,5 +14,6 @@ Cook Book API built in Go and GraphQL (gqlgen)
 # Stretch Goals
 - integrate with a RDBMS (PostgreSQL?)
 - user reviews and ratings
-- ?
+- refactoring
+- response type for client calls
 
