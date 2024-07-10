@@ -2,27 +2,55 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
+
+type Recipe {
   id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+  title: String!
+  description: String!
+  image: String
+  ingredients: [String!]!
+  steps: [String!]!
 }
 
-type User {
-  id: ID!
-  name: String!
-}
 
+
+# list of recipes, only the title
 type Query {
-  todos: [Todo!]!
+  recipes: [Recipe]
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+# open a specific recipe
+type Query {
+  recipe(title: String!): Recipe
 }
 
+
+# create a new recipe
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  createRecipe(
+    id: ID!
+    title: String!
+    description: String!
+    image: String
+    ingredients: [String!]!
+    steps: [String!]!
+  ): Recipe
 }
+
+# modify the information fields of a recipe, and return the updated recipe
+type Mutation {
+  updateRecipe(
+    title: String!
+    description: String
+    image: String
+    ingredients: [String!]
+    steps: [String!]
+  ): Recipe
+}
+
+# delete a recipe
+type Mutation {
+  deleteRecipe(title: String!): Boolean
+}
+
+
