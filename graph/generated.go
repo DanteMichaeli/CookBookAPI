@@ -48,7 +48,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreateRecipe func(childComplexity int, id string, title string, description string, image *string, ingredients []string, steps []string) int
+		CreateRecipe func(childComplexity int, id string, title string, description string, image string, ingredients []string, steps []string) int
 		DeleteRecipe func(childComplexity int, title string) int
 		UpdateRecipe func(childComplexity int, title string, description *string, image *string, ingredients []string, steps []string) int
 	}
@@ -69,9 +69,9 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateRecipe(ctx context.Context, id string, title string, description string, image *string, ingredients []string, steps []string) (*model.Recipe, error)
+	CreateRecipe(ctx context.Context, id string, title string, description string, image string, ingredients []string, steps []string) (*model.Recipe, error)
 	UpdateRecipe(ctx context.Context, title string, description *string, image *string, ingredients []string, steps []string) (*model.Recipe, error)
-	DeleteRecipe(ctx context.Context, title string) (*bool, error)
+	DeleteRecipe(ctx context.Context, title string) (*model.Recipe, error)
 }
 type QueryResolver interface {
 	ListRecipes(ctx context.Context) ([]*model.Recipe, error)
@@ -107,7 +107,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateRecipe(childComplexity, args["id"].(string), args["title"].(string), args["description"].(string), args["image"].(*string), args["ingredients"].([]string), args["steps"].([]string)), true
+		return e.complexity.Mutation.CreateRecipe(childComplexity, args["id"].(string), args["title"].(string), args["description"].(string), args["image"].(string), args["ingredients"].([]string), args["steps"].([]string)), true
 
 	case "Mutation.deleteRecipe":
 		if e.complexity.Mutation.DeleteRecipe == nil {
@@ -347,10 +347,10 @@ func (ec *executionContext) field_Mutation_createRecipe_args(ctx context.Context
 		}
 	}
 	args["description"] = arg2
-	var arg3 *string
+	var arg3 string
 	if tmp, ok := rawArgs["image"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-		arg3, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg3, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -525,7 +525,7 @@ func (ec *executionContext) _Mutation_createRecipe(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateRecipe(rctx, fc.Args["id"].(string), fc.Args["title"].(string), fc.Args["description"].(string), fc.Args["image"].(*string), fc.Args["ingredients"].([]string), fc.Args["steps"].([]string))
+		return ec.resolvers.Mutation().CreateRecipe(rctx, fc.Args["id"].(string), fc.Args["title"].(string), fc.Args["description"].(string), fc.Args["image"].(string), fc.Args["ingredients"].([]string), fc.Args["steps"].([]string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -666,9 +666,9 @@ func (ec *executionContext) _Mutation_deleteRecipe(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(*model.Recipe)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalORecipe2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteRecipe(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -678,7 +678,21 @@ func (ec *executionContext) fieldContext_Mutation_deleteRecipe(ctx context.Conte
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Recipe_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Recipe_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Recipe_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Recipe_image(ctx, field)
+			case "ingredients":
+				return ec.fieldContext_Recipe_ingredients(ctx, field)
+			case "steps":
+				return ec.fieldContext_Recipe_steps(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Recipe", field.Name)
 		},
 	}
 	defer func() {

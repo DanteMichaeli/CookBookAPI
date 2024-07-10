@@ -25,7 +25,7 @@ type Mutation {
     id: ID!
     title: String!
     description: String!
-    image: String
+    image: String!
     ingredients: [String!]!
     steps: [String!]!
   ): Recipe
@@ -40,5 +40,5 @@ type Mutation {
   ): Recipe
 
   # delete a recipe
-  deleteRecipe(title: String!): Boolean
+  deleteRecipe(title: String!): Recipe
 }

@@ -14,8 +14,6 @@ import (
 	"github.com/DanteMichaeli/CookBookAPI/graph/model"
 )
 
-const recipesDir = "recipes"
-
 // CreateRecipe is the resolver for the createRecipe field.
 func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, image string, ingredients []string, steps []string) (*model.Recipe, error) {
 	//new recipe instance
@@ -114,8 +112,32 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, title string, descr
 }
 
 // DeleteRecipe is the resolver for the deleteRecipe field.
-func (r *mutationResolver) DeleteRecipe(ctx context.Context, title string) (*bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteRecipe - deleteRecipe"))
+func (r *mutationResolver) DeleteRecipe(ctx context.Context, title string) (*model.Recipe, error) {
+	// check if title is empty
+	if title == "" {
+		return nil, fmt.Errorf("title is required")
+	}
+
+	// construct recipe file path, based on title
+	fileName := fmt.Sprintf("%s.json", title)
+	filePath := filepath.Join(recipesDir, fileName)
+
+	// check if recipe file exists
+	_, err := os.Stat(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("recipe named %s not found", title)
+		}
+		return nil, fmt.Errorf("error checking recipe file: %w", err)
+	}
+
+	// delete recipe file
+	err = os.Remove(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("error deleting recipe file: %w", err)
+	}
+
+	return &model.Recipe{Title: title}, nil
 }
 
 // ListRecipes is the resolver for the listRecipes field.
@@ -136,3 +158,11 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+const recipesDir = "recipes"
