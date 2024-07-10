@@ -171,7 +171,38 @@ func (r *queryResolver) ListRecipes(ctx context.Context) ([]*model.Recipe, error
 
 // OpenRecipe is the resolver for the openRecipe field.
 func (r *queryResolver) OpenRecipe(ctx context.Context, title string) (*model.Recipe, error) {
-	panic(fmt.Errorf("not implemented: OpenRecipe - openRecipe"))
+	// check if title is empty
+	if title == "" {
+		return nil, fmt.Errorf("title is required")
+	}
+
+	// construct recipe file path, based on title
+	fileName := fmt.Sprintf("%s.json", title)
+	filePath := filepath.Join(recipesDir, fileName)
+
+	// check if recipe file exists
+	_, err := os.Stat(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("recipe named %s not found", title)
+		}
+		return nil, fmt.Errorf("error checking recipe file: %w", err)
+	}
+
+	// read recipe file
+	recipeJSON, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading recipe file: %w", err)
+	}
+
+	// decode recipe
+	recipe := &model.Recipe{}
+	err = json.Unmarshal(recipeJSON, recipe)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding recipe: %w", err)
+	}
+
+	return recipe, nil
 }
 
 // Mutation returns MutationResolver implementation.
