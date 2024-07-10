@@ -53,7 +53,64 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title st
 
 // UpdateRecipe is the resolver for the updateRecipe field.
 func (r *mutationResolver) UpdateRecipe(ctx context.Context, title string, description *string, image *string, ingredients []string, steps []string) (*model.Recipe, error) {
-	panic(fmt.Errorf("not implemented: UpdateRecipe - updateRecipe"))
+	// check if title is empty
+	if title == "" {
+		return nil, fmt.Errorf("title is required")
+	}
+
+	// construct recipe file path, based on title
+	fileName := fmt.Sprintf("%s.json", title)
+	filePath := filepath.Join(recipesDir, fileName)
+
+	// check if recipe file exists
+	_, err := os.Stat(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("recipe named %s not found", title)
+		}
+		return nil, fmt.Errorf("error checking recipe file: %w", err)
+	}
+
+	// load recipe from JSON file
+	recipeJSON, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading recipe file: %w", err)
+	}
+
+	// create recipe instance
+	existingRecipe := &model.Recipe{}
+	err = json.Unmarshal(recipeJSON, existingRecipe)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding recipe: %w", err)
+	}
+
+	// apply updates
+	if description != nil {
+		existingRecipe.Description = *description
+	}
+	if image != nil {
+		existingRecipe.Image = *image
+	}
+	if ingredients != nil {
+		existingRecipe.Ingredients = ingredients
+	}
+	if steps != nil {
+		existingRecipe.Steps = steps
+	}
+
+	// encode to JSON
+	recipeJSON, err = json.Marshal(existingRecipe)
+	if err != nil {
+		return nil, fmt.Errorf("error encoding recipe: %w", err)
+	}
+
+	// write recipe to file
+	err = os.WriteFile(filePath, recipeJSON, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("error writing recipe to file: %w", err)
+	}
+
+	return existingRecipe, nil
 }
 
 // DeleteRecipe is the resolver for the deleteRecipe field.
