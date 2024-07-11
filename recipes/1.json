@@ -1,19 +1,19 @@
 {
   "id": "1",
-  "title": "Chocolate Cake",
-  "description": "A delicious chocolate cake recipe.",
+  "title": "Updated Pasta Primavera",
+  "description": "New description for pasta dish",
   "ingredients": [
-    "2 cups flour",
-    "1 cup sugar",
-    "1 cup cocoa powder",
-    "1 cup milk",
-    "2 eggs"
+    "Pasta",
+    "Broccoli",
+    "Carrots",
+    "Bell peppers",
+    "Parmesan cheese",
+    "Cherry tomatoes"
   ],
   "steps": [
-    "Preheat oven to 350°F",
-    "Mix dry ingredients",
-    "Add wet ingredients",
-    "Pour into pan",
-    "Bake for 30 minutes"
+    "Cook pasta al dente",
+    "Sauté vegetables",
+    "Add cherry tomatoes",
+    "Mix together and serve with Parmesan"
   ]
 }

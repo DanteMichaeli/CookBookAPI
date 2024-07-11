@@ -1,20 +1,18 @@
 {
   "id": "2",
-  "title": "Spaghetti Bolognese with Basil",
-  "description": "A classic Italian pasta dish with fresh basil.",
+  "title": "Spaghetti Carbonara",
+  "description": "Traditional Italian pasta with eggs and pancetta",
   "ingredients": [
-    "200g spaghetti",
-    "100g ground beef",
-    "1 can tomato sauce",
-    "1 onion",
-    "2 cloves garlic",
-    "Fresh basil"
+    "Spaghetti",
+    "Eggs",
+    "Pancetta",
+    "Parmesan cheese",
+    "Black pepper"
   ],
   "steps": [
-    "Boil spaghetti",
-    "Cook beef with onions and garlic",
-    "Add tomato sauce and basil",
-    "Mix with spaghetti",
-    "Serve hot"
+    "Cook spaghetti",
+    "Fry pancetta",
+    "Mix eggs and cheese",
+    "Combine and serve with black pepper"
   ]
 }
