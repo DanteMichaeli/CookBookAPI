@@ -17,7 +17,7 @@ import (
 // CreateRecipe is the resolver for the createRecipe field. Creates a recipe from the given input, stores it in the recipes directory as a JSON file.
 func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, ingredients []string, steps []string) (*model.Response, error) {
 	// check if id is empty
-	err := idCheck(id)
+	err := idExists(id)
 	if err != nil {
 		return &model.Response{Success: false, Message: "Failed to create recipe."}, err
 	}
@@ -49,7 +49,7 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title st
 // UpdateRecipe is the resolver for the updateRecipe field. Updates data of an existing recipe (ID immutable)
 func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *string, description *string, ingredients []string, steps []string) (*model.Response, error) {
 	// check if id is empty
-	err := idCheck(id)
+	err := idExists(id)
 	if err != nil {
 		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
 	}
@@ -92,7 +92,7 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *s
 // DeleteRecipe is the resolver for the deleteRecipe field.
 func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.Response, error) {
 	// check if id is empty
-	err := idCheck(id)
+	err := idNotExist(id)
 	if err != nil {
 		return &model.Response{Success: false, Message: "Failed to delete recipe.", Recipe: nil}, err
 	}

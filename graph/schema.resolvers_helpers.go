@@ -12,22 +12,35 @@ import (
 const recipesDir = "recipes"
 
 // checks if a recipe with the given id exists in the recipes directory
-func idCheck(id string) error {
+func idExists(id string) error {
+	fileName := fmt.Sprintf("%s.json", id)
+	filePath := filepath.Join(recipesDir, fileName)
+
+	_, err := os.Stat(filePath)
+	if err != nil {
+		if os.IsExist(err) {
+			return fmt.Errorf("recipe with id %s already exists:", id)
+		}
+		return fmt.Errorf("error checking recipe file: %w", err)
+	}
+
+	return nil
+}
+
+// checks if a recipe with the given id does NOT exist:
+func idNotExist(id string) error {
 	fileName := fmt.Sprintf("%s.json", id)
 	filePath := filepath.Join(recipesDir, fileName)
 
 	_, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// If the file does not exist, this is not an error in this context
-			return nil
+			return fmt.Errorf("recipe with id %s does not exist:", id)
 		}
-		// Return an error if we cannot determine if the file exists for reasons other than it not existing
 		return fmt.Errorf("error checking recipe file: %w", err)
 	}
 
-	// If os.Stat does not return an error, the file exists
-	return fmt.Errorf("recipe with id %s already exists", id)
+	return nil
 }
 
 // encodes a recipeInput file to a JSON file
