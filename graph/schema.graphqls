@@ -2,8 +2,10 @@
 #
 # https://gqlgen.com/getting-started/
 
+scalar RecipeID
+
 type Recipe {
-  id: ID!
+  id: RecipeID!
   title: String!
   description: String!
   ingredients: [String!]!
@@ -18,13 +20,13 @@ type Response {
 
 type Query {
   # fetches recipe. Granularity (data verbosity) and amount of recipes controlled by client
-  recipes(id: [ID!]): Response
+  recipes(id: [RecipeID!]): Response
 }
 
 type Mutation {
   # create a new recipe
   createRecipe(
-    id: ID!
+    id: RecipeID!
     title: String!
     description: String!
     ingredients: [String!]!
@@ -33,7 +35,7 @@ type Mutation {
 
   # update a recipe
   updateRecipe(
-    id: ID!
+    id: RecipeID!
     title: String
     description: String
     ingredients: [String!]
@@ -41,5 +43,5 @@ type Mutation {
   ): Response
 
   # delete a recipe
-  deleteRecipe(id: ID!): Response
+  deleteRecipe(id: RecipeID!): Response
 }

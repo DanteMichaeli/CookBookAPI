@@ -6,7 +6,7 @@ Cook Book API built in Go and GraphQL (gqlgen)
 - GraphQL for API communication
 - **gqlgen**: schema-first tool for generating Go/GraphQL server infra and backend business logic automatically
 
-# Core Functionalitied (CRUD)
+# Core Functionalities (CRUD)
 - create a new recipe
 - list existing recipes: should serve images, ingredients, steps
 - modify or delete existing recipes
