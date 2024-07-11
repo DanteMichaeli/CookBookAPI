@@ -113,9 +113,9 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 
 // Recipes is the resolver for the recipes field. If no id, list all recipes, otherwise list recipe with that ID.
 func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Response, error) {
-	var recipes []*model.Recipe = nil
+	var recipes []*model.Recipe
 	if id == nil {
-		// list all recipes
+		// List all recipes
 		files, err := os.ReadDir(recipesDir)
 		if err != nil {
 			return nil, fmt.Errorf("error reading recipes directory: %w", err)
@@ -123,14 +123,19 @@ func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Respon
 
 		recipes = []*model.Recipe{}
 		for _, file := range files {
-			recipePtr, err := decodeRecipe(file.Name())
+			fileName := file.Name()
+			if filepath.Ext(fileName) == ".json" {
+				fileName = fileName[:len(fileName)-len(".json")]
+			}
+
+			recipePtr, err := decodeRecipe(fileName)
 			if err != nil {
 				return nil, err
 			}
 			recipes = append(recipes, recipePtr)
 		}
 	} else {
-		// list recipe with given ID
+		// List recipes with given IDs
 		recipes = []*model.Recipe{}
 		for _, recipeID := range id {
 			recipePtr, err := decodeRecipe(recipeID)
@@ -139,7 +144,6 @@ func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Respon
 			}
 			recipes = append(recipes, recipePtr)
 		}
-
 	}
 	return &model.Response{Success: true, Message: "Recipe(s) listed successfully.", Recipe: recipes}, nil
 }
