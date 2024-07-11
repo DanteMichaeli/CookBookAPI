@@ -79,8 +79,10 @@ mutation {
     }
   }
 }
+```
 
 **2. List All Recipes (or only some of them by providing ids):**
+```graphql
 query {
   recipes {
     success
@@ -94,8 +96,10 @@ query {
     }
   }
 }
+```
 
 **3. Update Recipes:**
+```graphql
 mutation {
   updateRecipe(
     id: "1"
@@ -135,10 +139,11 @@ mutation {
     }
   }
 }
-
-**4. List Updated Recipes:**
+```
+**4. List Updated Recipes:** see step 2
 
 **5. Delete Recipe:**
+```graphql
 mutation {
   deleteRecipe(id: "3") {
     success
@@ -152,5 +157,5 @@ mutation {
     }
   }
 }
-
+```
 ... et.c.
