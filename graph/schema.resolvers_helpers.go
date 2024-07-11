@@ -18,13 +18,16 @@ func idCheck(id string) error {
 
 	_, err := os.Stat(filePath)
 	if err != nil {
-		if os.IsExist(err) {
-			return fmt.Errorf("recipe with id %s already exists:", id)
+		if os.IsNotExist(err) {
+			// If the file does not exist, this is not an error in this context
+			return nil
 		}
+		// Return an error if we cannot determine if the file exists for reasons other than it not existing
 		return fmt.Errorf("error checking recipe file: %w", err)
 	}
 
-	return nil
+	// If os.Stat does not return an error, the file exists
+	return fmt.Errorf("recipe with id %s already exists", id)
 }
 
 // encodes a recipeInput file to a JSON file
