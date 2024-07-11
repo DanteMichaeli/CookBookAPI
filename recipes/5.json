@@ -1,1 +1,23 @@
-{"id":"5","title":"Tomato Soup","description":"Simple and comforting tomato soup","image":"https://www.saltandlavender.com/wp-content/uploads/2022/09/easy-tomato-soup-9-500x500.jpg","ingredients":["Tomatoes","Onion","Garlic","Vegetable broth","Basil","Salt","Pepper"],"steps":["Sauté onions and garlic","Add tomatoes and broth","Simmer for 20 minutes","Blend until smooth","Season with salt and pepper","Garnish with basil"]}
+{
+  "id": "5",
+  "title": "Tomato Soup",
+  "description": "Simple and comforting tomato soup",
+  "image": "https://www.saltandlavender.com/wp-content/uploads/2022/09/easy-tomato-soup-9-500x500.jpg",
+  "ingredients": [
+    "Tomatoes",
+    "Onion",
+    "Garlic",
+    "Vegetable broth",
+    "Basil",
+    "Salt",
+    "Pepper"
+  ],
+  "steps": [
+    "Sauté onions and garlic",
+    "Add tomatoes and broth",
+    "Simmer for 20 minutes",
+    "Blend until smooth",
+    "Season with salt and pepper",
+    "Garnish with basil"
+  ]
+}

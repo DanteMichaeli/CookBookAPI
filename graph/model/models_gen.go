@@ -12,7 +12,18 @@ type Recipe struct {
 	ID          string   `json:"id"`
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
-	Image       string   `json:"image"`
 	Ingredients []string `json:"ingredients"`
 	Steps       []string `json:"steps"`
+}
+
+type RecipeInput struct {
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Ingredients []string `json:"ingredients"`
+	Steps       []string `json:"steps"`
+}
+
+type Response struct {
+	Message string `json:"message"`
 }

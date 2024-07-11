@@ -2,21 +2,30 @@
 #
 # https://gqlgen.com/getting-started/
 
-
 type Recipe {
   id: ID!
   title: String!
   description: String!
-  image: String! #URL
   ingredients: [String!]!
   steps: [String!]!
 }
 
+input RecipeInput {
+  id: ID!
+  title: String!
+  description: String!
+  ingredients: [String!]!
+  steps: [String!]!
+}
+
+type Response {
+  success: Boolean!
+  message: String!
+}
+
 type Query {
-  # list of recipes, only the title
-  listRecipes: [Recipe]
-  # open a specific recipe
-  openRecipe(title: String!): Recipe
+  # fetches recipe. Granularity (data verbosity) and amount of recipes controlled by client
+  recipes(title: String): [Recipe]
 }
 
 type Mutation {
@@ -25,20 +34,19 @@ type Mutation {
     id: ID!
     title: String!
     description: String!
-    image: String!
     ingredients: [String!]!
     steps: [String!]!
   ): Recipe
 
   # update a recipe
   updateRecipe(
-    title: String!
+    id: ID!
+    title: String
     description: String
-    image: String
     ingredients: [String!]
     steps: [String!]
   ): Recipe
 
   # delete a recipe
-  deleteRecipe(title: String!): Recipe
+  deleteRecipe(id: ID!): Recipe
 }

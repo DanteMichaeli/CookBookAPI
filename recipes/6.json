@@ -1,0 +1,27 @@
+{
+  "id": "6",
+  "title": "Grilled Chicken Salad",
+  "description": "Healthy and delicious grilled chicken salad",
+  "image": "https://www.example.com/grilled-chicken-salad.jpg",
+  "ingredients": [
+    "Chicken breast",
+    "Lettuce",
+    "Tomatoes",
+    "Cucumber",
+    "Red onion",
+    "Avocado",
+    "Lemon juice",
+    "Olive oil",
+    "Salt",
+    "Pepper"
+  ],
+  "steps": [
+    "Marinate chicken with olive oil, lemon juice, salt, and pepper",
+    "Grill chicken until cooked through",
+    "Chop lettuce, tomatoes, cucumber, and red onion",
+    "Slice avocado",
+    "Assemble salad with grilled chicken on top",
+    "Drizzle with olive oil and lemon juice",
+    "Season with salt and pepper to taste"
+  ]
+}

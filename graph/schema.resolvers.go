@@ -14,43 +14,41 @@ import (
 	"github.com/DanteMichaeli/CookBookAPI/graph/model"
 )
 
-// CreateRecipe is the resolver for the createRecipe field.
-func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, image string, ingredients []string, steps []string) (*model.Recipe, error) {
-	//new recipe instance
-	recipe := &model.Recipe{
-		ID:          id,
-		Title:       title,
-		Description: description,
-		Image:       image,
-		Ingredients: ingredients,
-		Steps:       steps,
+// CreateRecipe is the resolver for the createRecipe field. Creates a recipe from the given input, stores it in the recipes directory as a JSON file.
+func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.RecipeInput) (*model.Response, error) {
+
+	// check if title is empty
+	err := idCheck(input.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// create recipe instance
+	recipe := &model.RecipeInput{
+		ID:          input.ID,
+		Title:       input.Title,
+		Description: input.Description,
+		Ingredients: input.Ingredients,
+		Steps:       input.Steps,
 	}
 
 	//encode to JSON
-	recipeJSON, err := json.Marshal(recipe)
+	recipeJSON, err := encodeRecipe(recipe)
 	if err != nil {
-		return nil, fmt.Errorf("error encoding recipe: %w", err)
+		return nil, err
 	}
 
-	// Directory info for saving recipes
-	err = os.MkdirAll(recipesDir, 0755)
+	// Write recipe to directory
+	err = writeToDir(input.ID, recipeJSON)
 	if err != nil {
-		return nil, fmt.Errorf("error creating recipes directory: %w", err)
+		return nil, err
 	}
 
-	// Write recipe to file
-	fileName := fmt.Sprintf("%s.json", id)
-	filePath := filepath.Join(recipesDir, fileName)
-	err = os.WriteFile(filePath, recipeJSON, 0644)
-	if err != nil {
-		return nil, fmt.Errorf("error writing recipe to file: %w", err)
-	}
-
-	return recipe, nil
+	return &model.Response{Message: "Recipe created successfully"}, nil
 }
 
 // UpdateRecipe is the resolver for the updateRecipe field.
-func (r *mutationResolver) UpdateRecipe(ctx context.Context, title string, description *string, image *string, ingredients []string, steps []string) (*model.Recipe, error) {
+func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *string, description *string, ingredients []string, steps []string) (*model.Recipe, error) {
 	// check if title is empty
 	if title == "" {
 		return nil, fmt.Errorf("title is required")
@@ -112,7 +110,7 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, title string, descr
 }
 
 // DeleteRecipe is the resolver for the deleteRecipe field.
-func (r *mutationResolver) DeleteRecipe(ctx context.Context, title string) (*model.Recipe, error) {
+func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.Recipe, error) {
 	// check if title is empty
 	if title == "" {
 		return nil, fmt.Errorf("title is required")
@@ -140,7 +138,26 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, title string) (*mod
 	return &model.Recipe{Title: title}, nil
 }
 
-// ListRecipes is the resolver for the listRecipes field.
+// Recipes is the resolver for the recipes field.
+func (r *queryResolver) Recipes(ctx context.Context, title *string) ([]*model.Recipe, error) {
+	panic(fmt.Errorf("not implemented: Recipes - recipes"))
+}
+
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
+// Query returns QueryResolver implementation.
+func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
 func (r *queryResolver) ListRecipes(ctx context.Context) ([]*model.Recipe, error) {
 	// list files in recipes directory
 	files, err := os.ReadDir(recipesDir)
@@ -168,8 +185,6 @@ func (r *queryResolver) ListRecipes(ctx context.Context) ([]*model.Recipe, error
 
 	return recipes, nil
 }
-
-// OpenRecipe is the resolver for the openRecipe field.
 func (r *queryResolver) OpenRecipe(ctx context.Context, title string) (*model.Recipe, error) {
 	// check if title is empty
 	if title == "" {
@@ -204,20 +219,3 @@ func (r *queryResolver) OpenRecipe(ctx context.Context, title string) (*model.Re
 
 	return recipe, nil
 }
-
-// Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
-
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
-
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-const recipesDir = "recipes"
