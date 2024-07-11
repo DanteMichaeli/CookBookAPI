@@ -28,7 +28,7 @@ func idCheck(id string) error {
 }
 
 // encodes a recipeInput file to a JSON file
-func encodeRecipe(recipe *model.RecipeInput) ([]byte, error) {
+func encodeRecipe(recipe *model.Recipe) ([]byte, error) {
 	recipeJSON, err := json.Marshal(recipe)
 	if err != nil {
 		return nil, fmt.Errorf("error encoding recipe: %w", err)

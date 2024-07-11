@@ -16,15 +16,8 @@ type Recipe struct {
 	Steps       []string `json:"steps"`
 }
 
-type RecipeInput struct {
-	ID          string   `json:"id"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Ingredients []string `json:"ingredients"`
-	Steps       []string `json:"steps"`
-}
-
 type Response struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+	Success bool    `json:"success"`
+	Message string  `json:"message"`
+	Recipe  *Recipe `json:"recipe,omitempty"`
 }

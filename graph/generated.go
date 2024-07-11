@@ -67,14 +67,15 @@ type ComplexityRoot struct {
 
 	Response struct {
 		Message func(childComplexity int) int
+		Recipe  func(childComplexity int) int
 		Success func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
-	CreateRecipe(ctx context.Context, id string, title string, description string, ingredients []string, steps []string) (*model.Recipe, error)
-	UpdateRecipe(ctx context.Context, id string, title *string, description *string, ingredients []string, steps []string) (*model.Recipe, error)
-	DeleteRecipe(ctx context.Context, id string) (*model.Recipe, error)
+	CreateRecipe(ctx context.Context, id string, title string, description string, ingredients []string, steps []string) (*model.Response, error)
+	UpdateRecipe(ctx context.Context, id string, title *string, description *string, ingredients []string, steps []string) (*model.Response, error)
+	DeleteRecipe(ctx context.Context, id string) (*model.Response, error)
 }
 type QueryResolver interface {
 	Recipes(ctx context.Context, title *string) ([]*model.Recipe, error)
@@ -189,6 +190,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Response.Message(childComplexity), true
 
+	case "Response.recipe":
+		if e.complexity.Response.Recipe == nil {
+			break
+		}
+
+		return e.complexity.Response.Recipe(childComplexity), true
+
 	case "Response.success":
 		if e.complexity.Response.Success == nil {
 			break
@@ -203,9 +211,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
-	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputRecipeInput,
-	)
+	inputUnmarshalMap := graphql.BuildUnmarshalerMap()
 	first := true
 
 	switch rc.Operation.Operation {
@@ -529,9 +535,9 @@ func (ec *executionContext) _Mutation_createRecipe(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Recipe)
+	res := resTmp.(*model.Response)
 	fc.Result = res
-	return ec.marshalORecipe2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
+	return ec.marshalOResponse2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createRecipe(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -542,18 +548,14 @@ func (ec *executionContext) fieldContext_Mutation_createRecipe(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Recipe_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Recipe_title(ctx, field)
-			case "description":
-				return ec.fieldContext_Recipe_description(ctx, field)
-			case "ingredients":
-				return ec.fieldContext_Recipe_ingredients(ctx, field)
-			case "steps":
-				return ec.fieldContext_Recipe_steps(ctx, field)
+			case "success":
+				return ec.fieldContext_Response_success(ctx, field)
+			case "message":
+				return ec.fieldContext_Response_message(ctx, field)
+			case "recipe":
+				return ec.fieldContext_Response_recipe(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Recipe", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Response", field.Name)
 		},
 	}
 	defer func() {
@@ -593,9 +595,9 @@ func (ec *executionContext) _Mutation_updateRecipe(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Recipe)
+	res := resTmp.(*model.Response)
 	fc.Result = res
-	return ec.marshalORecipe2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
+	return ec.marshalOResponse2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateRecipe(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -606,18 +608,14 @@ func (ec *executionContext) fieldContext_Mutation_updateRecipe(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Recipe_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Recipe_title(ctx, field)
-			case "description":
-				return ec.fieldContext_Recipe_description(ctx, field)
-			case "ingredients":
-				return ec.fieldContext_Recipe_ingredients(ctx, field)
-			case "steps":
-				return ec.fieldContext_Recipe_steps(ctx, field)
+			case "success":
+				return ec.fieldContext_Response_success(ctx, field)
+			case "message":
+				return ec.fieldContext_Response_message(ctx, field)
+			case "recipe":
+				return ec.fieldContext_Response_recipe(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Recipe", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Response", field.Name)
 		},
 	}
 	defer func() {
@@ -657,9 +655,9 @@ func (ec *executionContext) _Mutation_deleteRecipe(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Recipe)
+	res := resTmp.(*model.Response)
 	fc.Result = res
-	return ec.marshalORecipe2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
+	return ec.marshalOResponse2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteRecipe(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -670,18 +668,14 @@ func (ec *executionContext) fieldContext_Mutation_deleteRecipe(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Recipe_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Recipe_title(ctx, field)
-			case "description":
-				return ec.fieldContext_Recipe_description(ctx, field)
-			case "ingredients":
-				return ec.fieldContext_Recipe_ingredients(ctx, field)
-			case "steps":
-				return ec.fieldContext_Recipe_steps(ctx, field)
+			case "success":
+				return ec.fieldContext_Response_success(ctx, field)
+			case "message":
+				return ec.fieldContext_Response_message(ctx, field)
+			case "recipe":
+				return ec.fieldContext_Response_recipe(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Recipe", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Response", field.Name)
 		},
 	}
 	defer func() {
@@ -1194,6 +1188,59 @@ func (ec *executionContext) fieldContext_Response_message(_ context.Context, fie
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Response_recipe(ctx context.Context, field graphql.CollectedField, obj *model.Response) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Response_recipe(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Recipe, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Recipe)
+	fc.Result = res
+	return ec.marshalORecipe2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Response_recipe(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Response",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Recipe_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Recipe_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Recipe_description(ctx, field)
+			case "ingredients":
+				return ec.fieldContext_Recipe_ingredients(ctx, field)
+			case "steps":
+				return ec.fieldContext_Recipe_steps(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Recipe", field.Name)
 		},
 	}
 	return fc, nil
@@ -2972,61 +3019,6 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputRecipeInput(ctx context.Context, obj interface{}) (model.RecipeInput, error) {
-	var it model.RecipeInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"id", "title", "description", "ingredients", "steps"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ID = data
-		case "title":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Title = data
-		case "description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
-		case "ingredients":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ingredients"))
-			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Ingredients = data
-		case "steps":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("steps"))
-			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Steps = data
-		}
-	}
-
-	return it, nil
-}
-
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3238,6 +3230,8 @@ func (ec *executionContext) _Response(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "recipe":
+			out.Values[i] = ec._Response_recipe(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3989,6 +3983,13 @@ func (ec *executionContext) marshalORecipe2ᚖgithubᚗcomᚋDanteMichaeliᚋCoo
 		return graphql.Null
 	}
 	return ec._Recipe(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOResponse2ᚖgithubᚗcomᚋDanteMichaeliᚋCookBookAPIᚋgraphᚋmodelᚐResponse(ctx context.Context, sel ast.SelectionSet, v *model.Response) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Response(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {

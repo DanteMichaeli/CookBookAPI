@@ -10,17 +10,10 @@ type Recipe {
   steps: [String!]!
 }
 
-input RecipeInput {
-  id: ID!
-  title: String!
-  description: String!
-  ingredients: [String!]!
-  steps: [String!]!
-}
-
 type Response {
   success: Boolean!
   message: String!
+  recipe: Recipe
 }
 
 type Query {
@@ -36,7 +29,7 @@ type Mutation {
     description: String!
     ingredients: [String!]!
     steps: [String!]!
-  ): Recipe
+  ): Response
 
   # update a recipe
   updateRecipe(
@@ -45,8 +38,8 @@ type Mutation {
     description: String
     ingredients: [String!]
     steps: [String!]
-  ): Recipe
+  ): Response
 
   # delete a recipe
-  deleteRecipe(id: ID!): Recipe
+  deleteRecipe(id: ID!): Response
 }
