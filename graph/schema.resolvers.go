@@ -15,12 +15,22 @@ import (
 )
 
 // CreateRecipe is the resolver for the createRecipe field. Creates a recipe from the given input, stores it in the recipes directory as a JSON file.
-func (r *mutationResolver) CreateRecipe(ctx context.Context, recipe model.Recipe) (*model.Response, error) {
+func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, ingredients []string, steps []string) (*model.Response, error) {
 	// check if title is empty
-	err := idCheck(recipe.ID)
+	err := idCheck(id)
 	if err != nil {
 		return nil, err
 	}
+
+	// instantiate recipe
+	recipe := model.Recipe{
+		ID:          id,
+		Title:       title,
+		Description: description,
+		Ingredients: ingredients,
+		Steps:       steps,
+	}
+	
 
 	//encode to JSON
 	recipeJSON, err := encodeRecipe(&recipe)
@@ -38,7 +48,7 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, recipe model.Recipe
 }
 
 // UpdateRecipe is the resolver for the updateRecipe field.
-func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *string, description *string, ingredients []string, steps []string) (*model.Recipe, error) {
+func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe ) (*model.Recipe, error) {
 	// check if title is empty
 	if title == "" {
 		return nil, fmt.Errorf("title is required")
