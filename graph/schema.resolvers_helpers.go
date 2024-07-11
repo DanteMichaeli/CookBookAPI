@@ -50,3 +50,20 @@ func writeToDir(ID string, recipeJSON []byte) error {
 }
 
 // decodes from a JSON file to a recipe struct
+func decodeRecipe(ID string) (*model.Recipe, error) {
+	fileName := fmt.Sprintf("%s.json", ID)
+	filePath := filepath.Join(recipesDir, fileName)
+
+	recipeFile, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading recipe file: %w", err)
+	}
+
+	recipe := &model.Recipe{}
+	err = json.Unmarshal(recipeFile, recipe)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding recipe: %w", err)
+	}
+
+	return recipe, nil
+}

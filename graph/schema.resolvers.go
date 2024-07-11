@@ -16,10 +16,10 @@ import (
 
 // CreateRecipe is the resolver for the createRecipe field. Creates a recipe from the given input, stores it in the recipes directory as a JSON file.
 func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, ingredients []string, steps []string) (*model.Response, error) {
-	// check if title is empty
+	// check if id is empty
 	err := idCheck(id)
 	if err != nil {
-		return nil, err
+		return &model.Response{Success: false, Message: "Failed to create recipe:"}, err
 	}
 
 	// instantiate recipe
@@ -30,83 +30,64 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title st
 		Ingredients: ingredients,
 		Steps:       steps,
 	}
-	
 
-	//encode to JSON
+	// encode to JSON
 	recipeJSON, err := encodeRecipe(&recipe)
 	if err != nil {
-		return nil, err
+		return &model.Response{Success: false, Message: "Failed to create recipe:"}, err
 	}
 
 	// Write recipe to directory
-	err = writeToDir(recipe.ID, recipeJSON)
+	err = writeToDir(id, recipeJSON)
 	if err != nil {
-		return nil, err
+		return &model.Response{Success: false, Message: "Failed to create recipe:"}, err
 	}
 
 	return &model.Response{Success: true, Message: "Recipe created successfully", Recipe: &recipe}, nil
 }
 
-// UpdateRecipe is the resolver for the updateRecipe field.
-func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe ) (*model.Recipe, error) {
-	// check if title is empty
-	if title == "" {
-		return nil, fmt.Errorf("title is required")
-	}
-
-	// construct recipe file path, based on title
-	fileName := fmt.Sprintf("%s.json", title)
-	filePath := filepath.Join(recipesDir, fileName)
-
-	// check if recipe file exists
-	_, err := os.Stat(filePath)
+// UpdateRecipe is the resolver for the updateRecipe field. Updates data of an existing recipe (ID immutable)
+func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title string, description string, ingredients []string, steps []string) (*model.Response, error) {
+	// check if id is empty
+	err := idCheck(id)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("recipe named %s not found", title)
-		}
-		return nil, fmt.Errorf("error checking recipe file: %w", err)
+		return &model.Response{Success: false, Message: "Failed to update recipe:"}, err
 	}
 
-	// load recipe from JSON file
-	recipeJSON, err := os.ReadFile(filePath)
+	// find and decode recipe JSON file
+	recipePtr, err := decodeRecipe(id)
 	if err != nil {
-		return nil, fmt.Errorf("error reading recipe file: %w", err)
+		return &model.Response{Success: false, Message: "Failed to update recipe:"}, err
 	}
 
-	// create recipe instance
-	existingRecipe := &model.Recipe{}
-	err = json.Unmarshal(recipeJSON, existingRecipe)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding recipe: %w", err)
+	// update recipe with provided fields ID
+	if title != "" {
+		recipePtr.Title = title
 	}
-
-	// apply updates
-	if description != nil {
-		existingRecipe.Description = *description
-	}
-	if image != nil {
-		existingRecipe.Image = *image
+	if description != "" {
+		recipePtr.Description = description
 	}
 	if ingredients != nil {
-		existingRecipe.Ingredients = ingredients
+		recipePtr.Ingredients = ingredients
 	}
 	if steps != nil {
-		existingRecipe.Steps = steps
+		recipePtr.Steps = steps
 	}
 
-	// encode to JSON
-	recipeJSON, err = json.Marshal(existingRecipe)
+	// encode updated recipe to JSON
+	recipeJSON, err := encodeRecipe(recipePtr)
 	if err != nil {
-		return nil, fmt.Errorf("error encoding recipe: %w", err)
+		return &model.Response{Success: false, Message: "Failed to update recipe:"}, err
 	}
 
-	// write recipe to file
-	err = os.WriteFile(filePath, recipeJSON, 0644)
+	// write updated recipe to directory
+	err = writeToDir(id, recipeJSON)
 	if err != nil {
-		return nil, fmt.Errorf("error writing recipe to file: %w", err)
+		return nil, err
 	}
 
-	return existingRecipe, nil
+	return &model.Response{Success: true, Message: "Recipe updated successfully", Recipe: recipePtr}, nil
+
 }
 
 // DeleteRecipe is the resolver for the deleteRecipe field.
