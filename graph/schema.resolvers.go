@@ -114,7 +114,7 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 // Recipes is the resolver for the recipes field. If no id, list all recipes, otherwise list recipe with that ID.
 func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Response, error) {
 	var recipes []*model.Recipe
-	if len(id) == 0 {
+	if id == nil {
 		// List all recipes
 		files, err := os.ReadDir(recipesDir)
 		if err != nil {
@@ -134,6 +134,8 @@ func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Respon
 			}
 			recipes = append(recipes, recipePtr)
 		}
+	} else if len(id) == 0 {
+		return &model.Response{Success: false, Message: "Failed to list recipe(s).", Recipe: nil}, fmt.Errorf("no recipe ID(s) provided")
 	} else {
 		// List recipes with given IDs
 		recipes = []*model.Recipe{}
