@@ -19,7 +19,7 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title st
 	// check if id is empty
 	err := idCheck(id)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to create recipe:"}, err
+		return &model.Response{Success: false, Message: "Failed to create recipe."}, err
 	}
 
 	// instantiate recipe
@@ -34,38 +34,38 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title st
 	// encode to JSON
 	recipeJSON, err := encodeRecipe(&recipe)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to create recipe:"}, err
+		return &model.Response{Success: false, Message: "Failed to create recipe.", Recipe: nil}, err
 	}
 
 	// Write recipe to directory
 	err = writeToDir(id, recipeJSON)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to create recipe:"}, err
+		return &model.Response{Success: false, Message: "Failed to create recipe.", Recipe: nil}, err
 	}
 
-	return &model.Response{Success: true, Message: "Recipe created successfully", Recipe: &recipe}, nil
+	return &model.Response{Success: true, Message: "Recipe created successfully.", Recipe: &recipe}, nil
 }
 
 // UpdateRecipe is the resolver for the updateRecipe field. Updates data of an existing recipe (ID immutable)
-func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title string, description string, ingredients []string, steps []string) (*model.Response, error) {
+func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *string, description *string, ingredients []string, steps []string) (*model.Response, error) {
 	// check if id is empty
 	err := idCheck(id)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to update recipe:"}, err
+		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
 	// find and decode recipe JSON file
 	recipePtr, err := decodeRecipe(id)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to update recipe:"}, err
+		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
 	// update recipe with provided fields ID
-	if title != "" {
-		recipePtr.Title = title
+	if title != nil {
+		recipePtr.Title = *title
 	}
-	if description != "" {
-		recipePtr.Description = description
+	if description != nil {
+		recipePtr.Description = *description
 	}
 	if ingredients != nil {
 		recipePtr.Ingredients = ingredients
@@ -77,46 +77,35 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title st
 	// encode updated recipe to JSON
 	recipeJSON, err := encodeRecipe(recipePtr)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to update recipe:"}, err
+		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
 	// write updated recipe to directory
 	err = writeToDir(id, recipeJSON)
 	if err != nil {
-		return nil, err
+		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
-	return &model.Response{Success: true, Message: "Recipe updated successfully", Recipe: recipePtr}, nil
-
+	return &model.Response{Success: true, Message: "Recipe updated successfully.", Recipe: recipePtr}, nil
 }
 
 // DeleteRecipe is the resolver for the deleteRecipe field.
-func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.Recipe, error) {
-	// check if title is empty
-	if title == "" {
-		return nil, fmt.Errorf("title is required")
-	}
-
-	// construct recipe file path, based on title
-	fileName := fmt.Sprintf("%s.json", title)
-	filePath := filepath.Join(recipesDir, fileName)
-
-	// check if recipe file exists
-	_, err := os.Stat(filePath)
+func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.Response, error) {
+	// check if id is empty
+	err := idCheck(id)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("recipe named %s not found", title)
-		}
-		return nil, fmt.Errorf("error checking recipe file: %w", err)
+		return &model.Response{Success: false, Message: "Failed to delete recipe.", Recipe: nil}, err
 	}
 
-	// delete recipe file
+	// delete JSON file with corresponding ID
+	fileName := fmt.Sprintf("%s.json", id)
+	filePath := filepath.Join(recipesDir, fileName)
 	err = os.Remove(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting recipe file: %w", err)
+		return &model.Response{Success: false, Message: "Failed to delete recipe.", Recipe: nil}, err
 	}
 
-	return &model.Recipe{Title: title}, nil
+	return &model.Response{Success: true, Message: "Recipe deleted successfully.", Recipe: nil}, nil
 }
 
 // Recipes is the resolver for the recipes field.
