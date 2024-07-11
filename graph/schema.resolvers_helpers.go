@@ -14,7 +14,7 @@ const recipesDir = "recipes"
 // checks if a recipe with the given id exists in the recipes directory
 func idCheck(id string) error {
 	fileName := fmt.Sprintf("%s.json", id)
-	filePath := fmt.Sprintf("%s/%s", recipesDir, fileName)
+	filePath := filepath.Join(recipesDir, fileName)
 
 	_, err := os.Stat(filePath)
 	if err != nil {
@@ -38,8 +38,8 @@ func encodeRecipe(recipe *model.Recipe) ([]byte, error) {
 }
 
 // writes JSON file to the recipes directory
-func writeToDir(ID string, recipeJSON []byte) error {
-	fileName := fmt.Sprintf("%s.json", ID)
+func writeToDir(id string, recipeJSON []byte) error {
+	fileName := fmt.Sprintf("%s.json", id)
 	filePath := filepath.Join(recipesDir, fileName)
 	err := os.WriteFile(filePath, recipeJSON, 0644)
 	if err != nil {
@@ -50,8 +50,8 @@ func writeToDir(ID string, recipeJSON []byte) error {
 }
 
 // decodes from a JSON file to a recipe struct
-func decodeRecipe(ID string) (*model.Recipe, error) {
-	fileName := fmt.Sprintf("%s.json", ID)
+func decodeRecipe(id string) (*model.Recipe, error) {
+	fileName := fmt.Sprintf("%s.json", id)
 	filePath := filepath.Join(recipesDir, fileName)
 
 	recipeFile, err := os.ReadFile(filePath)
