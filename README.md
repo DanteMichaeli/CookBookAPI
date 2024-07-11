@@ -19,6 +19,7 @@ Cook Book API built in Go and GraphQL (gqlgen)
 
 # Example Use Case:
 **1. Create recipes:**
+```graphql
 mutation {
   createRecipe(
     id: "1"
