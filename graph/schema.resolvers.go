@@ -114,11 +114,11 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 // Recipes is the resolver for the recipes field. If no id, list all recipes, otherwise list recipe with that ID.
 func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Response, error) {
 	var recipes []*model.Recipe
-	if id == nil {
+	if len(id) == 0 {
 		// List all recipes
 		files, err := os.ReadDir(recipesDir)
 		if err != nil {
-			return nil, fmt.Errorf("error reading recipes directory: %w", err)
+			return &model.Response{Success: false, Message: "Failed to list recipe(s).", Recipe: nil}, fmt.Errorf("error reading recipes directory: %w", err)
 		}
 
 		recipes = []*model.Recipe{}
@@ -130,7 +130,7 @@ func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Respon
 
 			recipePtr, err := decodeRecipe(fileName)
 			if err != nil {
-				return nil, err
+				return &model.Response{Success: false, Message: "Failed to list recipe(s).", Recipe: nil}, err
 			}
 			recipes = append(recipes, recipePtr)
 		}
@@ -140,7 +140,7 @@ func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Respon
 		for _, recipeID := range id {
 			recipePtr, err := decodeRecipe(recipeID)
 			if err != nil {
-				return nil, err
+				return &model.Response{Success: false, Message: "Failed to list recipe(s).", Recipe: nil}, err
 			}
 			recipes = append(recipes, recipePtr)
 		}
