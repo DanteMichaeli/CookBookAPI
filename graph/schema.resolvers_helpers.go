@@ -27,7 +27,7 @@ func idCheck(id string) error {
 	return nil
 }
 
-// encodes a recipe to a JSON file
+// encodes a recipeInput file to a JSON file
 func encodeRecipe(recipe *model.RecipeInput) ([]byte, error) {
 	recipeJSON, err := json.Marshal(recipe)
 	if err != nil {
@@ -48,3 +48,5 @@ func writeToDir(ID string, recipeJSON []byte) error {
 
 	return nil
 }
+
+// decodes from a JSON file to a recipe struct

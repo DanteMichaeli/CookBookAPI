@@ -16,7 +16,6 @@ import (
 
 // CreateRecipe is the resolver for the createRecipe field. Creates a recipe from the given input, stores it in the recipes directory as a JSON file.
 func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.RecipeInput) (*model.Response, error) {
-
 	// check if title is empty
 	err := idCheck(input.ID)
 	if err != nil {
@@ -44,7 +43,7 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.RecipeI
 		return nil, err
 	}
 
-	return &model.Response{Message: "Recipe created successfully"}, nil
+	return &model.Response{Success: true, Message: "Recipe created successfully"}, nil
 }
 
 // UpdateRecipe is the resolver for the updateRecipe field.
