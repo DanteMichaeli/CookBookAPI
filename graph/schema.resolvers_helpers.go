@@ -18,8 +18,8 @@ func idCheck(id string) error {
 
 	_, err := os.Stat(filePath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return fmt.Errorf("recipe with id %s not found", id)
+		if os.IsExist(err) {
+			return fmt.Errorf("recipe with id %s already exists:", id)
 		}
 		return fmt.Errorf("error checking recipe file: %w", err)
 	}
