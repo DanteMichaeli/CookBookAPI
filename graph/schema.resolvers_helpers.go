@@ -18,13 +18,13 @@ func idExists(id string) error {
 
 	_, err := os.Stat(filePath)
 	if err != nil {
-		if os.IsExist(err) {
-			return fmt.Errorf("recipe with id %s already exists:", id)
+		if os.IsNotExist(err) {
+			return nil // File does not exist, which is expected
 		}
 		return fmt.Errorf("error checking recipe file: %w", err)
 	}
 
-	return nil
+	return fmt.Errorf("recipe with id %s already exists", id)
 }
 
 // checks if a recipe with the given id does NOT exist:
