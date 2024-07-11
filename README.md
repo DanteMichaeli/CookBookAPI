@@ -28,7 +28,6 @@ mutation {
     ingredients: ["Pasta", "Broccoli", "Carrots", "Bell peppers", "Parmesan cheese"]
     steps: ["Cook pasta al dente", "Sauté vegetables", "Mix together and serve with Parmesan"]
   ) {
-    success
     message
     recipe {
       id
@@ -48,7 +47,6 @@ mutation {
     ingredients: ["Fettuccine", "Chicken breast", "Cream", "Garlic", "Parmesan cheese"]
     steps: ["Grill chicken", "Cook pasta", "Prepare sauce with cream, garlic, and cheese", "Combine and serve"]
   ) {
-    success
     message
     recipe {
       id
@@ -68,7 +66,6 @@ mutation {
     ingredients: ["Tomatoes", "Mozzarella cheese", "Fresh basil", "Olive oil", "Balsamic vinegar"]
     steps: ["Slice tomatoes and mozzarella", "Arrange on a plate with basil leaves", "Drizzle with olive oil and balsamic vinegar", "Season with salt and pepper"]
   ) {
-    success
     message
     recipe {
       id
@@ -85,7 +82,6 @@ mutation {
 ```graphql
 query {
   recipes {
-    success
     message
     recipe {
       id
@@ -108,7 +104,6 @@ mutation {
     ingredients: ["Pasta", "Broccoli", "Carrots", "Bell peppers", "Parmesan cheese", "Cherry tomatoes"]
     steps: ["Cook pasta al dente", "Sauté vegetables", "Add cherry tomatoes", "Mix together and serve with Parmesan"]
   ) {
-    success
     message
     recipe {
       id
@@ -128,7 +123,6 @@ mutation {
     ingredients: ["Spaghetti", "Eggs", "Pancetta", "Parmesan cheese", "Black pepper"]
     steps: ["Cook spaghetti", "Fry pancetta", "Mix eggs and cheese", "Combine and serve with black pepper"]
   ) {
-    success
     message
     recipe {
       id
@@ -146,7 +140,6 @@ mutation {
 ```graphql
 mutation {
   deleteRecipe(id: "3") {
-    success
     message
     recipe {
       id

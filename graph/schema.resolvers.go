@@ -18,7 +18,7 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title st
 	// check if id is empty
 	err := idExists(id)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to create recipe."}, err
+		return &model.Response{Message: "Failed to create recipe."}, err
 	}
 
 	// instantiate recipe
@@ -33,18 +33,18 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title st
 	// encode to JSON
 	recipeJSON, err := encodeRecipe(&recipe)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to create recipe.", Recipe: nil}, err
+		return &model.Response{Message: "Failed to create recipe.", Recipe: nil}, err
 	}
 
 	// Write recipe to directory
 	err = writeToDir(id, recipeJSON)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to create recipe.", Recipe: nil}, err
+		return &model.Response{Message: "Failed to create recipe.", Recipe: nil}, err
 	}
 
 	recipes := []*model.Recipe{&recipe}
 
-	return &model.Response{Success: true, Message: "Recipe created successfully.", Recipe: recipes}, nil
+	return &model.Response{Message: "Recipe created successfully.", Recipe: recipes}, nil
 }
 
 // UpdateRecipe is the resolver for the updateRecipe field. Updates data of an existing recipe (ID immutable)
@@ -52,13 +52,13 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *s
 	// check if id is empty
 	err := idNotExist(id)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
+		return &model.Response{Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
 	// find and decode recipe JSON file
 	recipePtr, err := decodeRecipe(id)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
+		return &model.Response{Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
 	// update recipe with provided fields ID
@@ -78,18 +78,18 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *s
 	// encode updated recipe to JSON
 	recipeJSON, err := encodeRecipe(recipePtr)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
+		return &model.Response{Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
 	// write updated recipe to directory
 	err = writeToDir(id, recipeJSON)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
+		return &model.Response{Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
 	recipes := []*model.Recipe{recipePtr}
 
-	return &model.Response{Success: true, Message: "Recipe updated successfully.", Recipe: recipes}, nil
+	return &model.Response{Message: "Recipe updated successfully.", Recipe: recipes}, nil
 }
 
 // DeleteRecipe is the resolver for the deleteRecipe field.
@@ -97,7 +97,7 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 	// check if id is empty
 	err := idNotExist(id)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to delete recipe.", Recipe: nil}, err
+		return &model.Response{Message: "Failed to delete recipe.", Recipe: nil}, err
 	}
 
 	// delete JSON file with corresponding ID
@@ -105,10 +105,10 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 	filePath := filepath.Join(recipesDir, fileName)
 	err = os.Remove(filePath)
 	if err != nil {
-		return &model.Response{Success: false, Message: "Failed to delete recipe.", Recipe: nil}, err
+		return &model.Response{Message: "Failed to delete recipe.", Recipe: nil}, err
 	}
 
-	return &model.Response{Success: true, Message: "Recipe deleted successfully.", Recipe: nil}, nil
+	return &model.Response{Message: "Recipe deleted successfully.", Recipe: nil}, nil
 }
 
 // Recipes is the resolver for the recipes field. If no id, list all recipes, otherwise list recipe with that ID.
@@ -118,7 +118,7 @@ func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Respon
 		// List all recipes
 		files, err := os.ReadDir(recipesDir)
 		if err != nil {
-			return &model.Response{Success: false, Message: "Failed to list recipe(s).", Recipe: nil}, fmt.Errorf("error reading recipes directory: %w", err)
+			return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, fmt.Errorf("error reading recipes directory: %w", err)
 		}
 
 		recipes = []*model.Recipe{}
@@ -130,24 +130,24 @@ func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Respon
 
 			recipePtr, err := decodeRecipe(fileName)
 			if err != nil {
-				return &model.Response{Success: false, Message: "Failed to list recipe(s).", Recipe: nil}, err
+				return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, err
 			}
 			recipes = append(recipes, recipePtr)
 		}
 	} else if len(id) == 0 {
-		return &model.Response{Success: false, Message: "Failed to list recipe(s).", Recipe: nil}, fmt.Errorf("no recipe ID(s) provided")
+		return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, fmt.Errorf("no recipe ID(s) provided")
 	} else {
 		// List recipes with given IDs
 		recipes = []*model.Recipe{}
 		for _, recipeID := range id {
 			recipePtr, err := decodeRecipe(recipeID)
 			if err != nil {
-				return &model.Response{Success: false, Message: "Failed to list recipe(s).", Recipe: nil}, err
+				return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, err
 			}
 			recipes = append(recipes, recipePtr)
 		}
 	}
-	return &model.Response{Success: true, Message: "Recipe(s) listed successfully.", Recipe: recipes}, nil
+	return &model.Response{Message: "Recipe(s) listed successfully.", Recipe: recipes}, nil
 }
 
 // Mutation returns MutationResolver implementation.

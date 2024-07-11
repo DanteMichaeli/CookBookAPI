@@ -13,7 +13,6 @@ type Recipe {
 }
 
 type Response {
-  success: Boolean!
   message: String!
   recipe: [Recipe]!
 }
