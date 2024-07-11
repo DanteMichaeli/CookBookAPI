@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -43,13 +42,15 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title st
 		return &model.Response{Success: false, Message: "Failed to create recipe.", Recipe: nil}, err
 	}
 
-	return &model.Response{Success: true, Message: "Recipe created successfully.", Recipe: &recipe}, nil
+	recipes := []*model.Recipe{&recipe}
+
+	return &model.Response{Success: true, Message: "Recipe created successfully.", Recipe: recipes}, nil
 }
 
 // UpdateRecipe is the resolver for the updateRecipe field. Updates data of an existing recipe (ID immutable)
 func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *string, description *string, ingredients []string, steps []string) (*model.Response, error) {
 	// check if id is empty
-	err := idExists(id)
+	err := idNotExist(id)
 	if err != nil {
 		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
 	}
@@ -86,7 +87,9 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *s
 		return &model.Response{Success: false, Message: "Failed to update recipe.", Recipe: nil}, err
 	}
 
-	return &model.Response{Success: true, Message: "Recipe updated successfully.", Recipe: recipePtr}, nil
+	recipes := []*model.Recipe{recipePtr}
+
+	return &model.Response{Success: true, Message: "Recipe updated successfully.", Recipe: recipes}, nil
 }
 
 // DeleteRecipe is the resolver for the deleteRecipe field.
@@ -108,9 +111,37 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 	return &model.Response{Success: true, Message: "Recipe deleted successfully.", Recipe: nil}, nil
 }
 
-// Recipes is the resolver for the recipes field.
-func (r *queryResolver) Recipes(ctx context.Context, title *string) ([]*model.Recipe, error) {
-	panic(fmt.Errorf("not implemented: Recipes - recipes"))
+// Recipes is the resolver for the recipes field. If no id, list all recipes, otherwise list recipe with that ID.
+func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Response, error) {
+	var recipes []*model.Recipe = nil
+	if id == nil {
+		// list all recipes
+		files, err := os.ReadDir(recipesDir)
+		if err != nil {
+			return nil, fmt.Errorf("error reading recipes directory: %w", err)
+		}
+
+		recipes = []*model.Recipe{}
+		for _, file := range files {
+			recipePtr, err := decodeRecipe(file.Name())
+			if err != nil {
+				return nil, err
+			}
+			recipes = append(recipes, recipePtr)
+		}
+	} else {
+		// list recipe with given ID
+		recipes = []*model.Recipe{}
+		for _, recipeID := range id {
+			recipePtr, err := decodeRecipe(recipeID)
+			if err != nil {
+				return nil, err
+			}
+			recipes = append(recipes, recipePtr)
+		}
+
+	}
+	return &model.Response{Success: true, Message: "Recipe(s) listed successfully.", Recipe: recipes}, nil
 }
 
 // Mutation returns MutationResolver implementation.
@@ -121,71 +152,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) ListRecipes(ctx context.Context) ([]*model.Recipe, error) {
-	// list files in recipes directory
-	files, err := os.ReadDir(recipesDir)
-	if err != nil {
-		return nil, fmt.Errorf("error reading recipes directory: %w", err)
-	}
-
-	recipes := []*model.Recipe{}
-	for _, file := range files {
-		// read recipe file
-		recipeJSON, err := os.ReadFile(filepath.Join(recipesDir, file.Name()))
-		if err != nil {
-			return nil, fmt.Errorf("error reading recipe file: %w", err)
-		}
-
-		// decode recipe
-		recipe := &model.Recipe{}
-		err = json.Unmarshal(recipeJSON, recipe)
-		if err != nil {
-			return nil, fmt.Errorf("error decoding recipe: %w", err)
-		}
-
-		recipes = append(recipes, recipe)
-	}
-
-	return recipes, nil
-}
-func (r *queryResolver) OpenRecipe(ctx context.Context, title string) (*model.Recipe, error) {
-	// check if title is empty
-	if title == "" {
-		return nil, fmt.Errorf("title is required")
-	}
-
-	// construct recipe file path, based on title
-	fileName := fmt.Sprintf("%s.json", title)
-	filePath := filepath.Join(recipesDir, fileName)
-
-	// check if recipe file exists
-	_, err := os.Stat(filePath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("recipe named %s not found", title)
-		}
-		return nil, fmt.Errorf("error checking recipe file: %w", err)
-	}
-
-	// read recipe file
-	recipeJSON, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("error reading recipe file: %w", err)
-	}
-
-	// decode recipe
-	recipe := &model.Recipe{}
-	err = json.Unmarshal(recipeJSON, recipe)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding recipe: %w", err)
-	}
-
-	return recipe, nil
-}

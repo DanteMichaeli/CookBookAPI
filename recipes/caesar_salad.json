@@ -1,0 +1,17 @@
+{
+  "id": "caesar_salad",
+  "title": "Caesar Salad",
+  "description": "A refreshing salad with romaine lettuce, croutons, Parmesan cheese, and Caesar dressing.",
+  "ingredients": [
+    "Romaine Lettuce",
+    "Croutons",
+    "Parmesan Cheese",
+    "Caesar Dressing"
+  ],
+  "steps": [
+    "Tear lettuce leaves into bite-sized pieces.",
+    "Add croutons and Parmesan cheese.",
+    "Toss with Caesar dressing until evenly coated.",
+    "Serve chilled."
+  ]
+}

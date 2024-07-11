@@ -13,12 +13,12 @@ type Recipe {
 type Response {
   success: Boolean!
   message: String!
-  recipe: Recipe
+  recipe: [Recipe]!
 }
 
 type Query {
   # fetches recipe. Granularity (data verbosity) and amount of recipes controlled by client
-  recipes(title: String): [Recipe]
+  recipes(id: [ID!]): Response
 }
 
 type Mutation {
