@@ -24,13 +24,7 @@ type Query {
 
 type Mutation {
   # create a new recipe
-  createRecipe(
-    id: RecipeID!
-    title: String!
-    description: String!
-    ingredients: [String!]!
-    steps: [String!]!
-  ): Response
+  createRecipe(recipeInput: RecipeInput!): Response
 
   # update a recipe
   updateRecipe(
