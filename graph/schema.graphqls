@@ -12,6 +12,22 @@ type Recipe {
   steps: [String!]!
 }
 
+input CreateRecipeInput {
+  id: RecipeID!
+  title: String!
+  description: String!
+  ingredients: [String!]!
+  steps: [String!]!
+}
+
+input UpdateRecipeInput {
+  id: RecipeID!
+  title: String
+  description: String
+  ingredients: [String!]
+  steps: [String!]
+}
+
 type Response {
   message: String!
   recipe: [Recipe]!
@@ -24,16 +40,10 @@ type Query {
 
 type Mutation {
   # create a new recipe
-  createRecipe(recipeInput: RecipeInput!): Response
+  createRecipe(input: CreateRecipeInput!): Response
 
   # update a recipe
-  updateRecipe(
-    id: RecipeID!
-    title: String
-    description: String
-    ingredients: [String!]
-    steps: [String!]
-  ): Response
+  updateRecipe(input: UpdateRecipeInput!): Response
 
   # delete a recipe
   deleteRecipe(id: RecipeID!): Response

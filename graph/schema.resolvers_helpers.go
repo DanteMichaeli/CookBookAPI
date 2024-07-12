@@ -121,3 +121,14 @@ func listWithID(id []string) ([]*model.Recipe, error) {
 
 	return recipes, nil
 }
+
+// converts a CreateRecipeInput to a recipe struct ptr
+func convertToRecipe(input model.CreateRecipeInput) *model.Recipe {
+	return &model.Recipe{
+		ID:          input.ID,
+		Title:       input.Title,
+		Description: input.Description,
+		Ingredients: input.Ingredients,
+		Steps:       input.Steps,
+	}
+}

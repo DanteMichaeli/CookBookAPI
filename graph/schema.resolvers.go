@@ -14,79 +14,73 @@ import (
 )
 
 // CreateRecipe is the resolver for the createRecipe field. Creates a recipe from the given input, stores it in the recipes directory as a JSON file.
-func (r *mutationResolver) CreateRecipe(ctx context.Context, id string, title string, description string, ingredients []string, steps []string) (*model.Response, error) {
+func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.CreateRecipeInput) (*model.Response, error) {
 	// check if id is empty
-	err := idExists(id)
+	err := idExists(input.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	// instantiate recipe
-	recipe := model.Recipe{
-		ID:          id,
-		Title:       title,
-		Description: description,
-		Ingredients: ingredients,
-		Steps:       steps,
-	}
+	recipe := convertToRecipe(input)
 
 	// encode to JSON
-	recipeJSON, err := encodeRecipe(&recipe)
+	recipeJSON, err := encodeRecipe(recipe)
 	if err != nil {
 		return nil, err
 	}
 
 	// Write recipe to directory
-	err = writeToDir(id, recipeJSON)
+	err = writeToDir(input.ID, recipeJSON)
 	if err != nil {
 		return nil, err
 	}
 
-	recipes := []*model.Recipe{&recipe}
+	recipes := []*model.Recipe{recipe}
 	return &model.Response{Message: "Recipe created", Recipe: recipes}, nil
 }
 
 // UpdateRecipe is the resolver for the updateRecipe field. Updates data of an existing recipe (ID immutable)
-func (r *mutationResolver) UpdateRecipe(ctx context.Context, id string, title *string, description *string, ingredients []string, steps []string) (*model.Response, error) {
+func (r *mutationResolver) UpdateRecipe(ctx context.Context, input model.UpdateRecipeInput) (*model.Response, error) {
 	// check if id is empty
-	err := idNotExist(id)
+	err := idNotExist(input.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	// find and decode recipe JSON file
-	recipePtr, err := decodeRecipe(id)
+	recipe, err := decodeRecipe(input.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	// update recipe with provided fields ID
-	if title != nil {
-		recipePtr.Title = *title
+	if input.Title != nil {
+		recipe.Title = *input.Title
 	}
-	if description != nil {
-		recipePtr.Description = *description
+	if input.Description != nil {
+		recipe.Description = *input.Description
 	}
-	if ingredients != nil {
-		recipePtr.Ingredients = ingredients
+	if input.Ingredients != nil {
+		recipe.Ingredients = input.Ingredients
 	}
-	if steps != nil {
-		recipePtr.Steps = steps
+	if input.Steps != nil {
+		recipe.Steps = input.Steps
 	}
 
 	// encode updated recipe to JSON
-	recipeJSON, err := encodeRecipe(recipePtr)
+	recipeJSON, err := encodeRecipe(recipe)
 	if err != nil {
 		return nil, err
 	}
 
 	// write updated recipe to directory
-	err = writeToDir(id, recipeJSON)
+	err = writeToDir(input.ID, recipeJSON)
 	if err != nil {
 		return nil, err
 	}
 
-	recipes := []*model.Recipe{recipePtr}
+	recipes := []*model.Recipe{recipe}
 
 	return &model.Response{Message: "Recipe updated", Recipe: recipes}, nil
 }
@@ -99,6 +93,13 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 		return nil, err
 	}
 
+	// decode JSON file for message output
+	recipe, err := decodeRecipe(id)
+	if err != nil {
+		return nil, err
+	}
+	recipes := []*model.Recipe{recipe}
+
 	// delete JSON file with corresponding ID
 	fileName := fmt.Sprintf("%s.json", id)
 	filePath := filepath.Join(recipesDir, fileName)
@@ -107,7 +108,7 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 		return nil, err
 	}
 
-	return nil, nil
+	return &model.Response{Message: "Recipe deleted", Recipe: recipes}, nil
 }
 
 // Recipes is the resolver for the recipes field. If no id, list all recipes, otherwise list recipe with that ID.

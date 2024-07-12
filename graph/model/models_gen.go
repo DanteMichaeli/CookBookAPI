@@ -2,6 +2,14 @@
 
 package model
 
+type CreateRecipeInput struct {
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Ingredients []string `json:"ingredients"`
+	Steps       []string `json:"steps"`
+}
+
 type Mutation struct {
 }
 
@@ -19,4 +27,12 @@ type Recipe struct {
 type Response struct {
 	Message string    `json:"message"`
 	Recipe  []*Recipe `json:"recipe"`
+}
+
+type UpdateRecipeInput struct {
+	ID          string   `json:"id"`
+	Title       *string  `json:"title,omitempty"`
+	Description *string  `json:"description,omitempty"`
+	Ingredients []string `json:"ingredients,omitempty"`
+	Steps       []string `json:"steps,omitempty"`
 }
