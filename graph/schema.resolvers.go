@@ -114,37 +114,23 @@ func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.
 // Recipes is the resolver for the recipes field. If no id, list all recipes, otherwise list recipe with that ID.
 func (r *queryResolver) Recipes(ctx context.Context, id []string) (*model.Response, error) {
 	var recipes []*model.Recipe
+	var err error
+
+	// if no id, list all recipes
 	if id == nil {
-		// List all recipes
-		files, err := os.ReadDir(recipesDir)
+		recipes, err = listAll()
 		if err != nil {
-			return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, fmt.Errorf("error reading recipes directory: %w", err)
+			return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, err
 		}
 
-		recipes = []*model.Recipe{}
-		for _, file := range files {
-			fileName := file.Name()
-			if filepath.Ext(fileName) == ".json" {
-				fileName = fileName[:len(fileName)-len(".json")]
-			}
-
-			recipePtr, err := decodeRecipe(fileName)
-			if err != nil {
-				return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, err
-			}
-			recipes = append(recipes, recipePtr)
-		}
 	} else if len(id) == 0 {
 		return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, fmt.Errorf("no recipe ID(s) provided")
+
 	} else {
 		// List recipes with given IDs
-		recipes = []*model.Recipe{}
-		for _, recipeID := range id {
-			recipePtr, err := decodeRecipe(recipeID)
-			if err != nil {
-				return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, err
-			}
-			recipes = append(recipes, recipePtr)
+		recipes, err = listWithID(id)
+		if err != nil {
+			return &model.Response{Message: "Failed to list recipe(s).", Recipe: nil}, err
 		}
 	}
 	return &model.Response{Message: "Recipe(s) listed successfully.", Recipe: recipes}, nil

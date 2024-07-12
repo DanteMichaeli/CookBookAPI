@@ -83,3 +83,41 @@ func decodeRecipe(id string) (*model.Recipe, error) {
 
 	return recipe, nil
 }
+
+// lists all recipes if no id is provided
+func listAll() ([]*model.Recipe, error) {
+	files, err := os.ReadDir(recipesDir)
+	if err != nil {
+		return nil, fmt.Errorf("error reading recipes directory: %w", err)
+	}
+
+	recipes := []*model.Recipe{}
+	for _, file := range files {
+		fileName := file.Name()
+		if filepath.Ext(fileName) == ".json" {
+			fileName = fileName[:len(fileName)-len(".json")]
+		}
+
+		recipePtr, err := decodeRecipe(fileName)
+		if err != nil {
+			return nil, err
+		}
+		recipes = append(recipes, recipePtr)
+	}
+
+	return recipes, nil
+}
+
+// lists the recipes whose IDs are provided
+func listWithID(id []string) ([]*model.Recipe, error) {
+	recipes := []*model.Recipe{}
+	for _, recipeID := range id {
+		recipePtr, err := decodeRecipe(recipeID)
+		if err != nil {
+			return nil, err
+		}
+		recipes = append(recipes, recipePtr)
+	}
+
+	return recipes, nil
+}
