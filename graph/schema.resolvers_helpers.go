@@ -21,7 +21,7 @@ func idExists(id string) error {
 		if os.IsNotExist(err) {
 			return nil // File does not exist, which is expected
 		}
-		return fmt.Errorf("error checking recipe file: %w", err)
+		return fmt.Errorf("error checking recipe file %w", err)
 	}
 
 	return fmt.Errorf("recipe with id %s already exists", id)
@@ -35,7 +35,7 @@ func idNotExist(id string) error {
 	_, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return fmt.Errorf("recipe with id %s does not exist:", id)
+			return fmt.Errorf("recipe with id %s does not exist", id)
 		}
 		return fmt.Errorf("error checking recipe file: %w", err)
 	}
@@ -47,7 +47,7 @@ func idNotExist(id string) error {
 func encodeRecipe(recipe *model.Recipe) ([]byte, error) {
 	recipeJSON, err := json.Marshal(recipe)
 	if err != nil {
-		return nil, fmt.Errorf("error encoding recipe: %w", err)
+		return nil, fmt.Errorf("error encoding recipe %w", err)
 	}
 
 	return recipeJSON, nil
@@ -59,7 +59,7 @@ func writeToDir(id string, recipeJSON []byte) error {
 	filePath := filepath.Join(recipesDir, fileName)
 	err := os.WriteFile(filePath, recipeJSON, 0644)
 	if err != nil {
-		return fmt.Errorf("error writing recipe to file: %w", err)
+		return fmt.Errorf("error writing recipe to file %w", err)
 	}
 
 	return nil
@@ -72,7 +72,7 @@ func decodeRecipe(id string) (*model.Recipe, error) {
 
 	recipeFile, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("error reading recipe file: %w", err)
+		return nil, fmt.Errorf("error reading recipe file %w", err)
 	}
 
 	recipe := &model.Recipe{}
@@ -88,7 +88,7 @@ func decodeRecipe(id string) (*model.Recipe, error) {
 func listAll() ([]*model.Recipe, error) {
 	files, err := os.ReadDir(recipesDir)
 	if err != nil {
-		return nil, fmt.Errorf("error reading recipes directory: %w", err)
+		return nil, fmt.Errorf("error reading recipes directory %w", err)
 	}
 
 	recipes := []*model.Recipe{}
